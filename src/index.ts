@@ -2,6 +2,7 @@ import dotenv from "dotenv";
 import express from "express";
 import mongoose from "mongoose";
 import cors from "cors";
+import authRoutes from "./routes/authRoutes";
 
 const app = express();
 
@@ -15,6 +16,8 @@ app.get("/", (_req, res) => {
   res.send("Hello World!");
 });
 app.use(cors({ origin: process.env.CLIENT_URL, credentials: true }));
+
+app.use("/api/auth", authRoutes);
 
 mongoose
   .connect(process.env.MONGO_URI || "")
