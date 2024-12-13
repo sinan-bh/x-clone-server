@@ -13,4 +13,12 @@ const registerSchema = z.object({
   image: z.string().optional(),
 });
 
-export { loginSchema, registerSchema };
+const editUserDetails = z.object({
+  name: z.string().min(3).optional(),
+  userName: z.string().optional(),
+  email: z.string().optional(),
+  profilePicture: z.string().optional(),
+  bio: z.string().optional(),
+});
+
+export { loginSchema, registerSchema, editUserDetails };

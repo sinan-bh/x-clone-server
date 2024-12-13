@@ -1,4 +1,4 @@
-import type { NextFunction, Request, Response } from "express";
+import type { Request, Response } from "express";
 import { User } from "../models/userModel";
 import { CustomError } from "../utils/error/customError";
 import { StandardResponse } from "../utils/standardResponse";
@@ -13,7 +13,6 @@ export const register = async (req: Request, res: Response) => {
     $or: [{ userName: userName }, { email: email }],
   });
 
-  console.log(existingUser);
 
   if (existingUser) {
     throw new CustomError("Email or UserName already exists", 400);
