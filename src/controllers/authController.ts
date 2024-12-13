@@ -41,10 +41,7 @@ export const login = async (req: Request, res: Response): Promise<void> => {
   const { loginField, password } = req.body;
 
   if (!loginField || !password) {
-    res
-      .status(400)
-      .json({ message: "Both loginField and password are required." });
-    return;
+    throw new CustomError("Both loginField and password are required.", 400);
   }
 
   const user = await User.findOne({
@@ -52,14 +49,12 @@ export const login = async (req: Request, res: Response): Promise<void> => {
   });
 
   if (!user) {
-    res.status(404).json({ message: "User not found." });
-    return;
+    throw new CustomError("User not found.", 404);
   }
 
   const isPasswordValid = await bcrypt.compare(password, user.password);
   if (!isPasswordValid) {
-    res.status(401).json({ message: "Invalid password." });
-    return;
+    throw new CustomError("Invalid password.", 401);
   }
 
   const token = jwt.sign(
@@ -72,13 +67,14 @@ export const login = async (req: Request, res: Response): Promise<void> => {
     { expiresIn: "1h" }
   );
 
-  res.status(200).json({
-    message: "Login successful",
-    token,
-    user: {
-      id: user._id,
-      userName: user.userName,
-      email: user.email,
-    },
-  });
+  res.status(200).json(
+    new StandardResponse("Login successful", {
+      token,
+      user: {
+        id: user._id,
+        userName: user.userName,
+        email: user.email,
+      },
+    })
+  );
 };
