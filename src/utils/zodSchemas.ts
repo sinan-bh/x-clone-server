@@ -19,6 +19,9 @@ const editUserDetails = z.object({
   email: z.string().optional(),
   profilePicture: z.string().optional(),
   bio: z.string().optional(),
+  bgImage: z.string().optional(),
+  location: z.string().optional(),
+  web: z.string().optional(),
 });
 
 export { loginSchema, registerSchema, editUserDetails };

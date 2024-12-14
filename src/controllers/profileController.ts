@@ -20,7 +20,13 @@ export const userProfile = async (req: Request, res: Response) => {
 
 export const updateUserProfile = async (req: Request, res: Response) => {
   const { userName } = req.params;
-  const { name, uName, email, profilePicture, bio } = req.body;
+  const { name, uName, email, bio } = req.body;
+
+  // Handle file uploads correctly by casting req.files
+  const files = req.files as {
+    profilePicture?: Express.Multer.File[];
+    bgImage?: Express.Multer.File[];
+  };
 
   const user = await User.findOne({ userName });
   if (!user) {
@@ -37,9 +43,30 @@ export const updateUserProfile = async (req: Request, res: Response) => {
 
   const updatedProfile = await User.findByIdAndUpdate(
     user._id,
-    { name, userName, email, profilePicture, bio },
+    { name, userName, email, bio },
     { new: true }
   );
+
+  // Check if updatedProfile is null before proceeding
+  if (!updatedProfile) {
+    throw new CustomError("User update failed", 400);
+  }
+
+  console.log(files); // To check if the files are being correctly uploaded
+
+  if (files.profilePicture && files.profilePicture[0]) {
+    // Handle profile picture upload logic here
+    const profilePictureUrl = files.profilePicture[0].path; // Assuming Cloudinary or another service
+    updatedProfile.profilePicture = profilePictureUrl;
+  }
+
+  if (files.bgImage && files.bgImage[0]) {
+    // Handle background image upload logic here
+    const bgImageUrl = files.bgImage[0].path; // Assuming Cloudinary or another service
+    updatedProfile.bgImage = bgImageUrl;
+  }
+
+  await updatedProfile.save();
 
   res
     .status(200)

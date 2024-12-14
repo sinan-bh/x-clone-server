@@ -8,6 +8,9 @@ export interface IUser extends Document {
   password: string;
   bio?: string;
   profilePicture?: string;
+  bgImage?: string;
+  web?: string;
+  location?: string;
   followers: mongoose.Types.ObjectId[];
   following: mongoose.Types.ObjectId[];
 }
@@ -20,6 +23,9 @@ const UserSchema: Schema = new Schema(
     password: { type: String, required: true },
     bio: { type: String },
     profilePicture: { type: String },
+    bgImage: { type: String },
+    web: { type: String },
+    location: { type: String },
     followers: [{ type: Schema.Types.ObjectId, ref: "User" }],
     following: [{ type: Schema.Types.ObjectId, ref: "User" }],
   },
