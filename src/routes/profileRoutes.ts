@@ -2,6 +2,8 @@ import express from "express";
 import {
   userProfile,
   updateUserProfile,
+  followUser,
+  followingFollowers,
 } from "../controllers/profileController";
 import { errorCatch } from "../utils/error/errorCatch";
 import { validateData } from "../middlewares/zodValidation";
@@ -20,5 +22,8 @@ router.put(
   validateData(editUserDetails),
   errorCatch(updateUserProfile)
 );
+
+router.put("/:followedUserId/:id", errorCatch(followUser));
+router.get("/:userName", errorCatch(followingFollowers));
 
 export default router;

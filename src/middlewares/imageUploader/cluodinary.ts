@@ -5,10 +5,6 @@ import dotenv from "dotenv";
 
 dotenv.config();
 
-console.log(process.env.CLOUDINARY_NAME);
-console.log(process.env.CLOUDINARY_API);
-console.log(process.env.CLOUDINARY_SECRET_KEY);
-
 cloudinary.config({
   cloud_name: process.env.CLOUDINARY_NAME,
   api_key: process.env.CLOUDINARY_API,
