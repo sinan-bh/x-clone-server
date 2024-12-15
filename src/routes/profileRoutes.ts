@@ -23,7 +23,7 @@ router.put(
   errorCatch(updateUserProfile)
 );
 
-router.put("/:followedUserId/:id", errorCatch(followUser));
-router.get("/:userName", errorCatch(followingFollowers));
+router.post("/:id", errorCatch(followUser));
+router.get("/:userId", errorCatch(followingFollowers));
 
 export default router;

@@ -12,6 +12,7 @@ export interface IUser extends Document {
   bgImage?: string;
   web?: string;
   location?: string;
+  followStatus: boolean;
   followers: mongoose.Types.ObjectId[];
   following: mongoose.Types.ObjectId[];
 }
@@ -27,6 +28,7 @@ const UserSchema: Schema = new Schema(
     bgImage: { type: String },
     web: { type: String },
     location: { type: String },
+    followStatus: { type: String, default: false },
     followers: [{ type: Schema.Types.ObjectId, ref: "User" }],
     following: [{ type: Schema.Types.ObjectId, ref: "User" }],
   },

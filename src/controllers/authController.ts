@@ -13,7 +13,6 @@ export const register = async (req: Request, res: Response) => {
     $or: [{ userName: userName }, { email: email }],
   });
 
-
   if (existingUser) {
     throw new CustomError("Email or UserName already exists", 400);
   }
@@ -28,9 +27,9 @@ export const register = async (req: Request, res: Response) => {
 
   res.status(201).json(
     new StandardResponse("Registration successfully Completed!", {
+      name: user.name,
       email: user.email,
-      firstName: user.name,
-      lastName: user.userName,
+      userName: user.userName,
     })
   );
 };
@@ -71,6 +70,7 @@ export const login = async (req: Request, res: Response): Promise<void> => {
       token,
       user: {
         id: user._id,
+        name: user.name,
         userName: user.userName,
         email: user.email,
       },

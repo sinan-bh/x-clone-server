@@ -71,68 +71,47 @@ export const updateUserProfile = async (req: Request, res: Response) => {
 };
 
 export const followUser = async (req: Request, res: Response) => {
-  try {
-    const followedUserId = req.params.followedUserId as string;
-    const id = req.params.id as string;
-    const isTrue = req.body.isFollow;
+  const { id } = req.params;
+  const { userId } = req.body;
 
-    if (!id || !followedUserId) {
-      throw new CustomError("User ID or Followed User ID is missing", 400);
-    }
-
-    const userId = new Types.ObjectId(id);
-    const followedId = new Types.ObjectId(followedUserId);
-
-    const user = await User.findById(userId);
-    const followedUser = await User.findById(followedId);
-
-    if (!user) {
-      throw new CustomError("User not found", 404);
-    }
-
-    if (!followedUser) {
-      throw new CustomError("User to follow not found", 404);
-    }
-
-    const isFollowing = followedUser.followers.includes(userId);
-
-    if (isFollowing) {
-      followedUser.followers = followedUser.followers.filter(
-        (f) => !f.equals(userId)
-      );
-      user.following = user.following.filter((f) => !f.equals(followedId));
-
-      await Promise.all([
-        User.updateOne({ _id: followedId }, { $pull: { followers: userId } }),
-        User.updateOne({ _id: userId }, { $pull: { following: followedId } }),
-      ]);
-
-      res.status(200).json(
-        new StandardResponse("User unfollowed successfully", {
-          user,
-          followedUser,
-        })
-      );
-    } else {
-      followedUser.followers.push(userId);
-      user.following.push(followedId);
-
-      await Promise.all([
-        User.updateOne({ _id: followedId }, { $push: { followers: userId } }),
-        User.updateOne({ _id: userId }, { $push: { following: followedId } }),
-      ]);
-
-      res.status(200).json(
-        new StandardResponse("User followed successfully", {
-          user,
-          followedUser,
-        })
-      );
-    }
-  } catch (error) {
-    console.error(error);
-    res.status(500).json(new StandardResponse("An error occurred", null));
+  if (!id || !userId) {
+    throw new CustomError("User ID or Followed User ID is missing", 400);
   }
+
+  const user = await User.findById(id);
+  const followedUser = await User.findById(userId);
+
+  if (!user) throw new CustomError("User not found", 404);
+  if (!followedUser) throw new CustomError("Followed User not found", 404);
+
+  user.followers = user.followers ?? [];
+  user.following = user.following ?? [];
+  followedUser.followers = followedUser.followers ?? [];
+  followedUser.following = followedUser.following ?? [];
+
+  const isFollowing = user.following.includes(userId);
+
+  if (isFollowing) {
+    user.following = user.following.filter(
+      (follower) => follower.toString() !== userId
+    );
+    followedUser.followers = followedUser.followers.filter(
+      (follower) => follower.toString() !== id
+    );
+  } else {
+    user.following.push(userId);
+    followedUser.followers.push(new Types.ObjectId(id));
+  }
+
+  await user.save();
+  await followedUser.save();
+
+  res.status(200).json(
+    new StandardResponse("Successfully unfollowed or followed", {
+      followedUser,
+      user,
+    })
+  );
 };
 
 export const followingFollowers = async (req: Request, res: Response) => {
@@ -150,8 +129,8 @@ export const followingFollowers = async (req: Request, res: Response) => {
 
   res.status(200).json(
     new StandardResponse("Successfully fetched followers or following", {
-      followers: user.followers,
-      following: user.following,
+      followUsers: status === "followers" ? user.followers : user.following,
     })
   );
 };
+
