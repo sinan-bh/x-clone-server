@@ -72,6 +72,7 @@ export const login = async (req: Request, res: Response): Promise<void> => {
         id: user._id,
         name: user.name,
         userName: user.userName,
+        profilePicture: user.profilePicture,
         email: user.email,
       },
     })
