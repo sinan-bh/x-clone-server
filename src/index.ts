@@ -4,6 +4,7 @@ import mongoose from "mongoose";
 import cors from "cors";
 import authRoutes from "./routes/authRoutes";
 import profileRoutes from "./routes/profileRoutes";
+import tweetsRoutes from "./routes/tweetsRoutes";
 
 const app = express();
 
@@ -20,6 +21,7 @@ app.use(cors({ origin: process.env.CLIENT_URL, credentials: true }));
 
 app.use("/api/auth", authRoutes);
 app.use("/api/user/", profileRoutes);
+app.use("/api/tweets/", tweetsRoutes);
 
 mongoose
   .connect(process.env.MONGO_URI || "")

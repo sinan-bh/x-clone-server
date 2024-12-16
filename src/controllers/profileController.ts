@@ -2,7 +2,6 @@ import type { Request, Response } from "express";
 import { User } from "../models/userModel";
 import { CustomError } from "../utils/error/customError";
 import { StandardResponse } from "../utils/standardResponse";
-import { CustomRequest } from "../types/interfaces";
 import { Types } from "mongoose";
 
 export const userProfile = async (req: Request, res: Response) => {

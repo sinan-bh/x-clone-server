@@ -2,7 +2,7 @@ import mongoose, { type Document, Schema } from "mongoose";
 
 export interface ITweet extends Document {
   user: mongoose.Types.ObjectId;
-  text: string;
+  text?: string;
   media?: string[];
   likes: mongoose.Types.ObjectId[];
   reposts: mongoose.Types.ObjectId[];
@@ -12,7 +12,7 @@ export interface ITweet extends Document {
 const TweetSchema: Schema = new Schema(
   {
     user: { type: Schema.Types.ObjectId, ref: "User", required: true },
-    text: { type: String, required: true },
+    text: { type: String },
     media: [{ type: String }],
     likes: [{ type: Schema.Types.ObjectId, ref: "User" }],
     reposts: [{ type: Schema.Types.ObjectId, ref: "User" }],

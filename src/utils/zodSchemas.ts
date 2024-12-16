@@ -24,4 +24,9 @@ const editUserDetails = z.object({
   web: z.string().optional(),
 });
 
-export { loginSchema, registerSchema, editUserDetails };
+const postTweet = z.object({
+  userId: z.string().optional(),
+  text: z.string().optional(),
+  media: z.string().optional(),
+});
+export { loginSchema, registerSchema, editUserDetails, postTweet };
