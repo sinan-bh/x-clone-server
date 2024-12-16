@@ -1,4 +1,4 @@
-import type { NextFunction, Request, Response } from "express";
+import type { Request, Response } from "express";
 import { User } from "../models/userModel";
 import { CustomError } from "../utils/error/customError";
 import { StandardResponse } from "../utils/standardResponse";
@@ -12,8 +12,6 @@ export const register = async (req: Request, res: Response) => {
   const existingUser = await User.findOne({
     $or: [{ userName: userName }, { email: email }],
   });
-
-  console.log(existingUser);
 
   if (existingUser) {
     throw new CustomError("Email or UserName already exists", 400);
@@ -29,9 +27,9 @@ export const register = async (req: Request, res: Response) => {
 
   res.status(201).json(
     new StandardResponse("Registration successfully Completed!", {
+      name: user.name,
       email: user.email,
-      firstName: user.name,
-      lastName: user.userName,
+      userName: user.userName,
     })
   );
 };
@@ -72,7 +70,9 @@ export const login = async (req: Request, res: Response): Promise<void> => {
       token,
       user: {
         id: user._id,
+        name: user.name,
         userName: user.userName,
+        profilePicture: user.profilePicture,
         email: user.email,
       },
     })
