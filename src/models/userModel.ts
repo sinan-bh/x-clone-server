@@ -13,6 +13,7 @@ export interface IUser extends Document {
   web?: string;
   location?: string;
   followStatus: boolean;
+  post: mongoose.Types.ObjectId[];
   followers: mongoose.Types.ObjectId[];
   following: mongoose.Types.ObjectId[];
 }
@@ -29,6 +30,9 @@ const UserSchema: Schema = new Schema(
     web: { type: String },
     location: { type: String },
     followStatus: { type: String, default: false },
+    post: [{ type: Schema.Types.ObjectId, ref: "Tweet" }],
+    rePost: [{ type: Schema.Types.ObjectId, ref: "Tweet" }],
+    likes: [{ type: Schema.Types.ObjectId, ref: "Tweet" }],
     followers: [{ type: Schema.Types.ObjectId, ref: "User" }],
     following: [{ type: Schema.Types.ObjectId, ref: "User" }],
   },

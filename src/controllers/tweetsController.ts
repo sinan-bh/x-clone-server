@@ -4,11 +4,10 @@ import { CustomError } from "../utils/error/customError";
 import { StandardResponse } from "../utils/standardResponse";
 import { Tweet } from "../models/tweetModel";
 import { CustomRequest } from "../types/interfaces";
+import { Types } from "mongoose";
 
 export const createTweets = async (req: Request, res: Response) => {
   const { text, userId } = req.body;
-
-  console.log(userId);
 
   if (!userId) {
     throw new CustomError("User not authenticated.");
@@ -23,6 +22,16 @@ export const createTweets = async (req: Request, res: Response) => {
   }
   const tweet = await Tweet.create({ user: userId, text, media });
 
+  const user = await User.findById(userId);
+
+  if (!tweet) {
+    throw new CustomError("tweet not found", 404);
+  }
+
+  user?.post.push(tweet._id);
+
+  user?.save();
+
   res
     .status(201)
     .json(new StandardResponse("Tweet created Successfully", tweet));
@@ -36,4 +45,28 @@ export const getTweets = async (req: Request, res: Response) => {
   }
 
   res.status(200).json(new StandardResponse("get all tweets", tweets));
+};
+
+export const userTweets = async (req: Request, res: Response) => {
+  const { userId } = req.params;
+
+  if (!userId) {
+    throw new CustomError("user not logined or token expaired", 404);
+  }
+
+  const user = await User.findById(userId).populate({
+    path: "post",
+    populate: {
+      path: "user",
+      model: "User",
+    },
+    options: { sort: { createdAt: -1 } },
+  });
+  if (!user) {
+    throw new CustomError("users not found", 404);
+  }
+
+  res
+    .status(200)
+    .json(new StandardResponse("successfully fetched tweets", user.post));
 };

@@ -1,5 +1,9 @@
 import express from "express";
-import { createTweets, getTweets } from "../controllers/tweetsController";
+import {
+  createTweets,
+  getTweets,
+  userTweets,
+} from "../controllers/tweetsController";
 import { errorCatch } from "../utils/error/errorCatch";
 import { validateData } from "../middlewares/zodValidation";
 import { editUserDetails, postTweet } from "../utils/zodSchemas";
@@ -18,5 +22,6 @@ router.post(
 );
 
 router.get("/", errorCatch(getTweets));
+router.get("/:userId", errorCatch(userTweets));
 
 export default router;
