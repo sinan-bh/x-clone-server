@@ -24,6 +24,6 @@ router.put(
 );
 
 router.post("/:id", errorCatch(followUser));
-router.get("/:userId", errorCatch(followingFollowers));
+router.get("/:userName", errorCatch(followingFollowers));
 
 export default router;

@@ -3,8 +3,6 @@ import { User } from "../models/userModel";
 import { CustomError } from "../utils/error/customError";
 import { StandardResponse } from "../utils/standardResponse";
 import { Tweet } from "../models/tweetModel";
-import { CustomRequest } from "../types/interfaces";
-import { Types } from "mongoose";
 
 export const createTweets = async (req: Request, res: Response) => {
   const { text, userId } = req.body;
@@ -22,15 +20,11 @@ export const createTweets = async (req: Request, res: Response) => {
   }
   const tweet = await Tweet.create({ user: userId, text, media });
 
-  const user = await User.findById(userId);
-
-  if (!tweet) {
-    throw new CustomError("tweet not found", 404);
-  }
-
-  user?.post.push(tweet._id);
-
-  user?.save();
+  const user = await User.findByIdAndUpdate(
+    userId,
+    { $push: { post: tweet._id } },
+    { new: true }
+  );
 
   res
     .status(201)
