@@ -4,6 +4,18 @@ import { CustomError } from "../utils/error/customError";
 import { StandardResponse } from "../utils/standardResponse";
 import { Types } from "mongoose";
 
+export const getAllUsers = async (_req: Request, res: Response) => {
+  const users = await User.find();
+
+  if (!users || users.length < 1) {
+    throw new CustomError("users not found", 404);
+  }
+
+  res
+    .status(200)
+    .json(new StandardResponse("successfully fetched users", users));
+};
+
 export const userProfile = async (req: Request, res: Response) => {
   const { userName } = req.params;
 
@@ -125,11 +137,9 @@ export const followingFollowers = async (req: Request, res: Response) => {
     throw new CustomError("User not found!", 404);
   }
 
-
   res.status(200).json(
     new StandardResponse("Successfully fetched followers or following", {
       followUsers: status === "followers" ? user.followers : user.following,
     })
   );
 };
-

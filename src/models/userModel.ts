@@ -25,7 +25,7 @@ const UserSchema: Schema = new Schema(
     email: { type: String, required: true, unique: true },
     password: { type: String, required: true },
     bio: { type: String },
-    profilePicture: { type: String },
+    profilePicture: { type: String , default: "https://png.pngitem.com/pimgs/s/24-248235_user-profile-avatar-login-account-fa-user-circle.png" },
     bgImage: { type: String },
     web: { type: String },
     location: { type: String },
