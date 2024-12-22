@@ -17,7 +17,7 @@ export const getAllUsers = async (_req: Request, res: Response) => {
 };
 
 export const userProfile = async (req: Request, res: Response) => {
-  const { userName } = req.params;
+  const { userName } = req.params;  
 
   const user = await User.findOne({ userName })
     .populate("following")

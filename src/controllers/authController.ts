@@ -27,7 +27,6 @@ const saveOTP = async (email: string, otp: string) => {
 
   await OTP.findOneAndDelete({ email });
 
-  // Save the new OTP
   const otpEntry = new OTP({ email, otp, expiresAt });
   await otpEntry.save();
 };
@@ -92,7 +91,7 @@ export const finalRegistration = async (
   req: Request,
   res: Response
 ): Promise<void> => {
-  const { name, userName, email, password } = req.body;
+  const { name, userName, email, password, profilePicture } = req.body;
 
   const existingUser = await User.findOne({ userName });
   if (existingUser) {
@@ -104,6 +103,7 @@ export const finalRegistration = async (
     userName,
     email,
     password,
+    profilePicture,
   });
   await user.save();
 
@@ -115,6 +115,8 @@ export const finalRegistration = async (
     })
   );
 };
+
+
 //Login
 export const login = async (req: Request, res: Response): Promise<void> => {
   const { loginField, password } = req.body;
@@ -155,6 +157,39 @@ export const login = async (req: Request, res: Response): Promise<void> => {
         userName: user.userName,
         profilePicture: user.profilePicture,
         email: user.email,
+      },
+    })
+  );
+};
+
+export const googleAuth = async (req: Request, res: Response) => {
+  const { email } = req.body;
+
+  const existingUser = await User.findOne({ email });
+
+  if (!existingUser) {
+    throw new CustomError("user not registered", 404);
+  }
+
+  const token = jwt.sign(
+    {
+      id: existingUser._id,
+      username: existingUser.userName,
+      email: existingUser.email,
+    },
+    process.env.JWT_SECRET_KEY || "",
+    { expiresIn: "1h" }
+  );
+
+  res.status(200).json(
+    new StandardResponse("Login successful", {
+      token,
+      user: {
+        id: existingUser._id,
+        name: existingUser.name,
+        userName: existingUser.userName,
+        profilePicture: existingUser.profilePicture,
+        email: existingUser.email,
       },
     })
   );

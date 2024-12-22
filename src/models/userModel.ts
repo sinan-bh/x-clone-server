@@ -14,6 +14,8 @@ export interface IUser extends Document {
   location?: string;
   followStatus: boolean;
   post: mongoose.Types.ObjectId[];
+  likes: mongoose.Types.ObjectId[];
+  saved: mongoose.Types.ObjectId[];
   followers: mongoose.Types.ObjectId[];
   following: mongoose.Types.ObjectId[];
 }
@@ -25,7 +27,11 @@ const UserSchema: Schema = new Schema(
     email: { type: String, required: true, unique: true },
     password: { type: String, required: true },
     bio: { type: String },
-    profilePicture: { type: String , default: "https://png.pngitem.com/pimgs/s/24-248235_user-profile-avatar-login-account-fa-user-circle.png" },
+    profilePicture: {
+      type: String,
+      default:
+        "https://png.pngitem.com/pimgs/s/24-248235_user-profile-avatar-login-account-fa-user-circle.png",
+    },
     bgImage: { type: String },
     web: { type: String },
     location: { type: String },
@@ -33,6 +39,7 @@ const UserSchema: Schema = new Schema(
     post: [{ type: Schema.Types.ObjectId, ref: "Tweet" }],
     rePost: [{ type: Schema.Types.ObjectId, ref: "Tweet" }],
     likes: [{ type: Schema.Types.ObjectId, ref: "Tweet" }],
+    saved: [{ type: Schema.Types.ObjectId, ref: "Tweet" }],
     followers: [{ type: Schema.Types.ObjectId, ref: "User" }],
     following: [{ type: Schema.Types.ObjectId, ref: "User" }],
   },

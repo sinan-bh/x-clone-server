@@ -1,6 +1,7 @@
 import express from "express";
 import {
   finalRegistration,
+  googleAuth,
   login,
   register,
   verifyOTP,
@@ -16,5 +17,6 @@ router.post("/register", validateData(registerSchema), errorCatch(register));
 router.post("/verify-otp", errorCatch(verifyOTP));
 router.post("/final-submission", errorCatch(finalRegistration));
 router.post("/login", validateData(loginSchema), errorCatch(login));
+router.post("/google-auth", errorCatch(googleAuth));
 
 export default router;

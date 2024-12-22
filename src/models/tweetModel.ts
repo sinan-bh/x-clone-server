@@ -6,6 +6,7 @@ export interface ITweet extends Document {
   media?: string[];
   likes: mongoose.Types.ObjectId[];
   reposts: mongoose.Types.ObjectId[];
+  saved: mongoose.Types.ObjectId[];
   comments: mongoose.Types.ObjectId[];
 }
 
@@ -16,6 +17,7 @@ const TweetSchema: Schema = new Schema(
     media: [{ type: String }],
     likes: [{ type: Schema.Types.ObjectId, ref: "User" }],
     reposts: [{ type: Schema.Types.ObjectId, ref: "User" }],
+    saved: [{ type: Schema.Types.ObjectId, ref: "User" }],
     comments: [{ type: Schema.Types.ObjectId, ref: "Comment" }],
   },
   { timestamps: true }
