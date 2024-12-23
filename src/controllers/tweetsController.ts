@@ -131,7 +131,6 @@ export const savedPost = async (req: CustomRequest, res: Response) => {
   const id = req.user?.id;
   const { postId } = req.params;
 
-  // Ensure postId is a string
   if (typeof postId !== "string") {
     throw new CustomError("Invalid postId", 400);
   }
@@ -168,4 +167,20 @@ export const savedPost = async (req: CustomRequest, res: Response) => {
       post,
     })
   );
+};
+
+export const getLikedTweets = async (req: CustomRequest, res: Response) => {
+  const userId = req.user?.id;
+
+  const user = await User.findById(userId).populate("likes");
+
+  if (!user) {
+    throw new CustomError("User not found", 404);
+  }
+
+  res
+    .status(200)
+    .json(
+      new StandardResponse("Successfully fetched user liked tweets", user.likes)
+    );
 };
