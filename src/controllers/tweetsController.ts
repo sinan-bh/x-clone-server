@@ -5,6 +5,7 @@ import { StandardResponse } from "../utils/standardResponse";
 import { Tweet } from "../models/tweetModel";
 import { CustomRequest } from "../types/interfaces";
 import { model, Types } from "mongoose";
+import { Comment } from "../models/commentModel";
 
 export const createTweets = async (req: Request, res: Response) => {
   const { text, userId } = req.body;
@@ -183,4 +184,58 @@ export const getLikedTweets = async (req: CustomRequest, res: Response) => {
     .json(
       new StandardResponse("Successfully fetched user liked tweets", user.likes)
     );
+};
+
+export const getByPost = async (req: Request, res: Response) => {
+  const { postId } = req.params;
+
+  const post = await Tweet.findById(postId).populate("user");
+
+  if (!post) {
+    throw new CustomError("Post not found", 404);
+  }
+
+  res
+    .status(200)
+    .json(new StandardResponse("Successfully fetched Tweet", post));
+};
+
+export const createComment = async (req: CustomRequest, res: Response) => {
+  const userId = req.user?.id;
+  const { postId } = req.params;
+  const { text } = req.body;
+
+  if (!userId) {
+    throw new CustomError("user not found", 404);
+  }
+
+  if (!postId) {
+    throw new CustomError("postId not found", 404);
+  }
+
+  const comment = await Comment.create({
+    user: userId,
+    tweet: postId,
+    text: text,
+  });
+
+  comment.save();
+
+  await User.findByIdAndUpdate(
+    userId,
+    {
+      comments: comment._id,
+    },
+    { new: true }
+  );
+
+  await Tweet.findByIdAndUpdate(
+    postId,
+    {
+      comments: comment._id,
+    },
+    { new: true }
+  );
+
+  res.status(201).json(new StandardResponse("comment created", comment));
 };

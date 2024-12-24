@@ -1,6 +1,8 @@
 import express from "express";
 import {
+  createComment,
   createTweets,
+  getByPost,
   getFollowingUserPost,
   getLikedTweets,
   getTweets,
@@ -24,5 +26,7 @@ router.get("/following", errorCatch(getFollowingUserPost));
 router.get("/:userId", errorCatch(userTweets));
 router.post("/likes/:postId", errorCatch(likedPost));
 router.post("/saved/:postId", errorCatch(savedPost));
+router.get("/comment/:postId", errorCatch(getByPost))
+router.post("/comment/:postId", errorCatch(createComment))
 
 export default router;

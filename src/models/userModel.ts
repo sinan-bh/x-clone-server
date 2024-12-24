@@ -16,6 +16,7 @@ export interface IUser extends Document {
   post: mongoose.Types.ObjectId[];
   likes: mongoose.Types.ObjectId[];
   saved: mongoose.Types.ObjectId[];
+  comments: mongoose.Types.ObjectId[];
   followers: mongoose.Types.ObjectId[];
   following: mongoose.Types.ObjectId[];
 }
@@ -40,6 +41,7 @@ const UserSchema: Schema = new Schema(
     rePost: [{ type: Schema.Types.ObjectId, ref: "Tweet" }],
     likes: [{ type: Schema.Types.ObjectId, ref: "Tweet" }],
     saved: [{ type: Schema.Types.ObjectId, ref: "Tweet" }],
+    comments: [{ type: Schema.Types.ObjectId, ref: "Comment" }],
     followers: [{ type: Schema.Types.ObjectId, ref: "User" }],
     following: [{ type: Schema.Types.ObjectId, ref: "User" }],
   },
