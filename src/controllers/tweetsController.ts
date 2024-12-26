@@ -138,8 +138,6 @@ export const savedPost = async (req: CustomRequest, res: Response) => {
 
   const userId = new Types.ObjectId(id);
 
-  console.log(id);
-
   const post = await Tweet.findById(new Types.ObjectId(postId));
   const user = await User.findById(userId);
 
@@ -238,4 +236,30 @@ export const createComment = async (req: CustomRequest, res: Response) => {
   );
 
   res.status(201).json(new StandardResponse("comment created", comment));
+};
+
+export const getComments = async (req: CustomRequest, res: Response) => {
+  const userId = req.user?.id;
+
+  const comments = await Comment.find({ user: userId })
+    .populate({
+      path: "user",
+      model: "User",
+    })
+    .populate({
+      path: "tweet",
+      populate: {
+        path: "user",
+        model: "User",
+      },
+    })
+    .sort({ createdAt: -1 });
+
+  if (!comments || comments.length < 1) {
+    throw new CustomError("comments not found", 404);
+  }
+
+  res
+    .status(200)
+    .json(new StandardResponse("successfully fetched comments", comments));
 };
