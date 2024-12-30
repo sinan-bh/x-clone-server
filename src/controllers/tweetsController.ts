@@ -4,7 +4,7 @@ import { CustomError } from "../utils/error/customError";
 import { StandardResponse } from "../utils/standardResponse";
 import { Tweet } from "../models/tweetModel";
 import { CustomRequest } from "../types/interfaces";
-import { model, Types } from "mongoose";
+import { Types } from "mongoose";
 import { Comment } from "../models/commentModel";
 
 export const createTweets = async (req: Request, res: Response) => {
@@ -80,7 +80,6 @@ export const userTweets = async (req: Request, res: Response) => {
       path: "user",
       model: "User",
     },
-    options: { sort: { createdAt: -1 } },
   });
   if (!user) {
     throw new CustomError("users not found", 404);
@@ -110,7 +109,7 @@ export const likedPost = async (req: CustomRequest, res: Response) => {
 
   if (isLiked) {
     post.likes = post.likes.filter((like) => !like.equals(userId));
-    user.likes = user.post.filter((p) => p.toString() !== postId);
+    user.likes = user.likes.filter((p) => p.toString() !== postId);
   } else {
     post.likes.push(userId);
     user.likes.push(new Types.ObjectId(postId));
@@ -127,8 +126,6 @@ export const likedPost = async (req: CustomRequest, res: Response) => {
 };
 
 export const savedPost = async (req: CustomRequest, res: Response) => {
-  console.log("aaaa");
-
   const id = req.user?.id;
   const { postId } = req.params;
 
@@ -171,7 +168,13 @@ export const savedPost = async (req: CustomRequest, res: Response) => {
 export const getLikedTweets = async (req: CustomRequest, res: Response) => {
   const userId = req.user?.id;
 
-  const user = await User.findById(userId).populate("likes");
+  const user = await User.findById(userId).populate({
+    path: "likes",
+    populate: {
+      path: "user",
+      model: "User",
+    },
+  });
 
   if (!user) {
     throw new CustomError("User not found", 404);
@@ -187,7 +190,15 @@ export const getLikedTweets = async (req: CustomRequest, res: Response) => {
 export const getByPost = async (req: Request, res: Response) => {
   const { postId } = req.params;
 
-  const post = await Tweet.findById(postId).populate("user");
+  const post = await Tweet.findById(postId)
+    .populate("user")
+    .populate({
+      path: "comments",
+      populate: {
+        path: "user",
+        model: "User",
+      },
+    });
 
   if (!post) {
     throw new CustomError("Post not found", 404);
@@ -217,12 +228,12 @@ export const createComment = async (req: CustomRequest, res: Response) => {
     text: text,
   });
 
-  comment.save();
+  await comment.save();
 
   await User.findByIdAndUpdate(
     userId,
     {
-      comments: comment._id,
+      $push: { comments: comment._id },
     },
     { new: true }
   );
@@ -230,7 +241,7 @@ export const createComment = async (req: CustomRequest, res: Response) => {
   await Tweet.findByIdAndUpdate(
     postId,
     {
-      comments: comment._id,
+      $push: { comments: comment._id },
     },
     { new: true }
   );
@@ -252,14 +263,30 @@ export const getComments = async (req: CustomRequest, res: Response) => {
         path: "user",
         model: "User",
       },
-    })
-    .sort({ createdAt: -1 });
-
-  if (!comments || comments.length < 1) {
-    throw new CustomError("comments not found", 404);
-  }
+      options: { sort: { createdAt: -1 } },
+    });
 
   res
     .status(200)
     .json(new StandardResponse("successfully fetched comments", comments));
+};
+
+export const getTweetById = async (req: Request, res: Response) => {
+  const { postId } = req.body;
+
+  const tweet = await Tweet.findById(postId).populate({
+    path: "comments",
+    populate: {
+      path: "user",
+      model: "User",
+    },
+  });
+
+  if (!tweet) {
+    throw new CustomError("tweet not found", 404);
+  }
+
+  res
+    .status(200)
+    .json(new StandardResponse("successfully fetched specified Tweet", tweet));
 };
