@@ -13,7 +13,7 @@ cloudinary.config({
 
 const storage = new CloudinaryStorage({
   cloudinary: cloudinary,
-  params: async (req, file) => {
+  params: async (_req, file) => {
     try {
       const allowedFormats = ["jpg", "jpeg", "png", "mp4", "mp3", "wav"];
       const fileType = file.mimetype.split("/")[0];

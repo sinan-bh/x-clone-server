@@ -2,11 +2,22 @@ import type { Request, Response } from "express";
 import { User } from "../models/userModel";
 import { CustomError } from "../utils/error/customError";
 import { StandardResponse } from "../utils/standardResponse";
-import { CustomRequest } from "../types/interfaces";
 import { Types } from "mongoose";
 
+export const getAllUsers = async (_req: Request, res: Response) => {
+  const users = await User.find();
+
+  if (!users || users.length < 1) {
+    throw new CustomError("users not found", 404);
+  }
+
+  res
+    .status(200)
+    .json(new StandardResponse("successfully fetched users", users));
+};
+
 export const userProfile = async (req: Request, res: Response) => {
-  const { userName } = req.params;
+  const { userName } = req.params;  
 
   const user = await User.findOne({ userName })
     .populate("following")
@@ -126,11 +137,9 @@ export const followingFollowers = async (req: Request, res: Response) => {
     throw new CustomError("User not found!", 404);
   }
 
-
   res.status(200).json(
     new StandardResponse("Successfully fetched followers or following", {
       followUsers: status === "followers" ? user.followers : user.following,
     })
   );
 };
-
