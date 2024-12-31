@@ -5,6 +5,7 @@ import {
   followUser,
   followingFollowers,
   getAllUsers,
+  searchUsers,
 } from "../controllers/profileController";
 import { errorCatch } from "../utils/error/errorCatch";
 import { validateData } from "../middlewares/zodValidation";
@@ -14,6 +15,7 @@ import upload from "../middlewares/imageUploader/cluodinary";
 const router = express.Router();
 
 router.get("/", errorCatch(getAllUsers));
+router.get("/search", errorCatch(searchUsers));
 router.get("/:userName", errorCatch(userProfile));
 router.put(
   "/:userName",

@@ -5,8 +5,8 @@ import cors from "cors";
 import authRoutes from "./routes/authRoutes";
 import profileRoutes from "./routes/profileRoutes";
 import tweetsRoutes from "./routes/tweetsRoutes";
-
-const app = express();
+import chatRoutes from "./routes/chatRoutes";
+import { app, server } from "./sockets/socket";
 
 dotenv.config();
 
@@ -22,11 +22,12 @@ app.use(cors({ origin: process.env.CLIENT_URL, credentials: true }));
 app.use("/api/auth", authRoutes);
 app.use("/api/user/", profileRoutes);
 app.use("/api/tweets/", tweetsRoutes);
+app.use("/api/chats/", chatRoutes);
 
 mongoose
   .connect(process.env.MONGO_URI || "")
   .then(() => {
-    app.listen(port, () => {
+    server.listen(port, () => {
       console.log(`Server is running on port ${port}`);
     });
   })
