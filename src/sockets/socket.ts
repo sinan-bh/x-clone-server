@@ -43,6 +43,8 @@ io.on("connection", (socket) => {
       content: string;
     }) => {
       try {
+        console.log(chatId, sender, content);
+        
         const message = new Message({
           sender,
           content,

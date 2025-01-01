@@ -6,9 +6,6 @@ import { CustomRequest } from "../types/interfaces";
 
 export const getChatMessages = async (req: Request, res: Response) => {
   const { chatId } = req.params;
-
-  console.log(chatId, "aa");
-
   const chat = await Chat.findById(chatId).populate("messages");
 
   res

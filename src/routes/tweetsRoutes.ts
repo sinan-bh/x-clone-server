@@ -1,9 +1,7 @@
 import express from "express";
 import {
-  createComment,
   createTweets,
   getByPost,
-  getComments,
   getFollowingUserPost,
   getLikedTweets,
   getTweets,
@@ -24,11 +22,9 @@ router.post("/", upload.array("media"), errorCatch(createTweets));
 router.get("/", errorCatch(getTweets));
 router.get("/liked", errorCatch(getLikedTweets));
 router.get("/following", errorCatch(getFollowingUserPost));
-router.get("/comment", errorCatch(getComments));
 router.get("/:postId", errorCatch(getByPost));
 router.get("/user/:userId", errorCatch(userTweets));
 router.post("/likes/:postId", errorCatch(likedPost));
 router.post("/saved/:postId", errorCatch(savedPost));
-router.post("/comment/:postId", errorCatch(createComment));
 
 export default router;

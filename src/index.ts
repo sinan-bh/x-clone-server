@@ -6,6 +6,7 @@ import authRoutes from "./routes/authRoutes";
 import profileRoutes from "./routes/profileRoutes";
 import tweetsRoutes from "./routes/tweetsRoutes";
 import chatRoutes from "./routes/chatRoutes";
+import commentsRoutes from "./routes/commentRoutes";
 import { app, server } from "./sockets/socket";
 
 dotenv.config();
@@ -23,6 +24,7 @@ app.use("/api/auth", authRoutes);
 app.use("/api/user/", profileRoutes);
 app.use("/api/tweets/", tweetsRoutes);
 app.use("/api/chats/", chatRoutes);
+app.use("/api/comments/", commentsRoutes);
 
 mongoose
   .connect(process.env.MONGO_URI || "")

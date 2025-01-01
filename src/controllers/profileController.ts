@@ -151,7 +151,6 @@ export const searchUsers = async (req: Request, res: Response) => {
   const users = await User.find({
     userName: { $regex: query, $options: "i" },
   });
-console.log(users);
 
   if (!users || users.length < 1) {
     throw new CustomError("Error searching users", 404);
