@@ -3,6 +3,7 @@ import {
   finalRegistration,
   googleAuth,
   login,
+  refreshToken,
   register,
   verifyOTP,
 } from "../controllers/authController";
@@ -16,6 +17,7 @@ const router = express.Router();
 router.post("/register", validateData(registerSchema), errorCatch(register));
 router.post("/verify-otp", errorCatch(verifyOTP));
 router.post("/final-submission", errorCatch(finalRegistration));
+router.post("//refresh", errorCatch(refreshToken));
 router.post("/login", validateData(loginSchema), errorCatch(login));
 router.post("/google-auth", errorCatch(googleAuth));
 

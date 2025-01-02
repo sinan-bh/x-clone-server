@@ -43,6 +43,22 @@ const sendOTP = async (email: string, otp: string) => {
   await transporter.sendMail(mailOptions);
 };
 
+const generateTokens = (user: any) => {
+  const accessToken = jwt.sign(
+    { id: user._id, username: user.userName, email: user.email },
+    process.env.JWT_SECRET_KEY || "",
+    { expiresIn: "1h" } // Access Token Validity
+  );
+
+  const refreshToken = jwt.sign(
+    { id: user._id },
+    process.env.JWT_REFRESH_SECRET_KEY || "",
+    { expiresIn: "7d" } // Refresh Token Validity
+  );
+
+  return { accessToken, refreshToken };
+};
+
 export const register = async (req: Request, res: Response) => {
   const { email } = req.body;
 
@@ -68,11 +84,7 @@ export const register = async (req: Request, res: Response) => {
 export const verifyOTP = async (req: Request, res: Response) => {
   const { email, otp } = req.body;
 
-  console.log(otp);
-
   const otpEntry = await OTP.findOne({ email });
-
-  console.log(otpEntry, "otp");
 
   if (!otpEntry || otpEntry.otp !== otp) {
     throw new CustomError("Invalid or expired OTP", 400);
@@ -116,6 +128,41 @@ export const finalRegistration = async (
   );
 };
 
+// Refresh Token Route
+export const refreshToken = async (req: Request, res: Response) => {
+  console.log("hhhhhhhhhhh");
+
+  const refreshToken = req.cookies.refreshToken; // Use HTTP-only cookie
+  if (!refreshToken) {
+    throw new CustomError("Refresh token not found", 401);
+  }
+
+  const decoded = jwt.verify(
+    refreshToken,
+    process.env.JWT_REFRESH_SECRET_KEY || ""
+  ) as any;
+
+  const user = await User.findById(decoded.id);
+  if (!user) {
+    throw new CustomError("User not found", 404);
+  }
+
+  const { accessToken, refreshToken: newRefreshToken } = generateTokens(user);
+
+  // Send the new refresh token in cookies
+  res.cookie("refreshToken", newRefreshToken, {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "development",
+    sameSite: "strict",
+    maxAge: 7 * 24 * 60 * 60 * 1000,
+  });
+
+  res.status(200).json(
+    new StandardResponse("successfully fetched refresh token", {
+      accessToken,
+    })
+  );
+};
 
 //Login
 export const login = async (req: Request, res: Response): Promise<void> => {
@@ -138,19 +185,28 @@ export const login = async (req: Request, res: Response): Promise<void> => {
     throw new CustomError("Invalid password.", 401);
   }
 
-  const token = jwt.sign(
-    {
-      id: user._id,
-      username: user.userName,
-      email: user.email,
-    },
-    process.env.JWT_SECRET_KEY || "",
-    { expiresIn: "1h" }
-  );
+  const { accessToken, refreshToken } = generateTokens(user);
+
+  res.cookie("refreshToken", refreshToken, {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "development",
+    sameSite: "strict",
+    maxAge: 7 * 24 * 60 * 60 * 1000,
+  });
+
+  // const token = jwt.sign(
+  //   {
+  //     id: user._id,
+  //     username: user.userName,
+  //     email: user.email,
+  //   },
+  //   process.env.JWT_SECRET_KEY || "",
+  //   { expiresIn: "1h" }
+  // );
 
   res.status(200).json(
     new StandardResponse("Login successful", {
-      token,
+      accessToken,
       user: {
         id: user._id,
         name: user.name,
@@ -171,19 +227,28 @@ export const googleAuth = async (req: Request, res: Response) => {
     throw new CustomError("user not registered", 404);
   }
 
-  const token = jwt.sign(
-    {
-      id: existingUser._id,
-      username: existingUser.userName,
-      email: existingUser.email,
-    },
-    process.env.JWT_SECRET_KEY || "",
-    { expiresIn: "1h" }
-  );
+  const { accessToken, refreshToken } = generateTokens(existingUser);
+
+  res.cookie("refreshToken", refreshToken, {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "development",
+    sameSite: "strict",
+    maxAge: 7 * 24 * 60 * 60 * 1000,
+  });
+
+  // const token = jwt.sign(
+  //   {
+  //     id: existingUser._id,
+  //     username: existingUser.userName,
+  //     email: existingUser.email,
+  //   },
+  //   process.env.JWT_SECRET_KEY || "",
+  //   { expiresIn: "1h" }
+  // );
 
   res.status(200).json(
     new StandardResponse("Login successful", {
-      token,
+      token: accessToken,
       user: {
         id: existingUser._id,
         name: existingUser.name,
