@@ -16,7 +16,6 @@ const errorResponse = (error: CustomError, res: Response) => {
 };
 
 export const globalErrorHandler = (
-  // biome-ignore lint/suspicious/noExplicitAny: the error can be multiple types
   error: any,
   _req: Request,
   res: Response,
