@@ -185,28 +185,28 @@ export const login = async (req: Request, res: Response): Promise<void> => {
     throw new CustomError("Invalid password.", 401);
   }
 
-  const { accessToken, refreshToken } = generateTokens(user);
+  // const { accessToken, refreshToken } = generateTokens(user);
 
-  res.cookie("refreshToken", refreshToken, {
-    httpOnly: true,
-    secure: process.env.NODE_ENV === "development",
-    sameSite: "strict",
-    maxAge: 7 * 24 * 60 * 60 * 1000,
-  });
+  // res.cookie("refreshToken", refreshToken, {
+  //   httpOnly: true,
+  //   secure: process.env.NODE_ENV === "development",
+  //   sameSite: "strict",
+  //   maxAge: 7 * 24 * 60 * 60 * 1000,
+  // });
 
-  // const token = jwt.sign(
-  //   {
-  //     id: user._id,
-  //     username: user.userName,
-  //     email: user.email,
-  //   },
-  //   process.env.JWT_SECRET_KEY || "",
-  //   { expiresIn: "1h" }
-  // );
+  const token = jwt.sign(
+    {
+      id: user._id,
+      username: user.userName,
+      email: user.email,
+    },
+    process.env.JWT_SECRET_KEY || "",
+    { expiresIn: "1h" }
+  );
 
   res.status(200).json(
     new StandardResponse("Login successful", {
-      accessToken,
+      token,
       user: {
         id: user._id,
         name: user.name,

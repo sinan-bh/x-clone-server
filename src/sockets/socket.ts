@@ -44,7 +44,7 @@ io.on("connection", (socket) => {
     }) => {
       try {
         console.log(chatId, sender, content);
-        
+
         const message = new Message({
           sender,
           content,
@@ -73,13 +73,42 @@ io.on("connection", (socket) => {
 
   //comments
   socket.on("comment", async ({ postId }) => {
-    console.log(postId);
-
     const tweet = await Tweet.findById(postId);
     const updatedComment = tweet?.comments.length && tweet?.comments.length + 1;
-    console.log(updatedComment);
-
     io.emit("updatedComments", { updatedComment, postId });
+  });
+
+  //following and followers
+
+  socket.on(
+    "joinProfile",
+    async ({
+      userName,
+      likedUserId,
+    }: {
+      userName: string;
+      likedUserId: string;
+    }) => {
+      console.log(`User joined profile room: ${userName}`);
+
+      const user = await User.findOne({ userName });
+      const isFollow = user?.followers.some(
+        (f) => f._id.toString() === likedUserId
+      );      
+
+      io.emit("previousFollowComment", { isFollow });
+    }
+  );
+
+  socket.on("followCount", async ({ userId, likedUserId }) => {
+    const user = await User.findById(userId);
+    const isFollow = user?.followers.some(
+      (f) => f._id.toString() === likedUserId
+    );
+
+    io.emit("updatedFollowCount", {
+      isFollow,
+    });
   });
 
   //notification
