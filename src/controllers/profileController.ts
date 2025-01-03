@@ -17,7 +17,7 @@ export const getAllUsers = async (_req: Request, res: Response) => {
 };
 
 export const userProfile = async (req: Request, res: Response) => {
-  const { userName } = req.params;  
+  const { userName } = req.params;
 
   const user = await User.findOne({ userName })
     .populate("following")
@@ -142,4 +142,20 @@ export const followingFollowers = async (req: Request, res: Response) => {
       followUsers: status === "followers" ? user.followers : user.following,
     })
   );
+};
+
+export const searchUsers = async (req: Request, res: Response) => {
+  const { query } = req.query;
+  console.log(query);
+  
+  const users = await User.find({
+    userName: { $regex: query, $options: "i" },
+  });
+
+  if (!users || users.length < 1) {
+    throw new CustomError("Error searching users", 404);
+  }
+  res
+    .status(200)
+    .json(new StandardResponse("successfully fetched users", users));
 };
