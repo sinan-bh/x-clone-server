@@ -3,6 +3,7 @@ import { Chat } from "../models/messageModel";
 import { StandardResponse } from "../utils/standardResponse";
 import { CustomError } from "../utils/error/customError";
 import { CustomRequest } from "../types/interfaces";
+import { Notification } from "../models/notification";
 
 export const getChatMessages = async (req: Request, res: Response) => {
   const { chatId } = req.params;
@@ -65,3 +66,5 @@ export const getParticipants = async (req: CustomRequest, res: Response) => {
     })
   );
 };
+
+
