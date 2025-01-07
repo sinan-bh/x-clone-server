@@ -26,9 +26,9 @@ io.on("connection", (socket) => {
     socket.join(chatId);
     console.log(`User joined room: ${chatId}`);
 
-    const chat = await Chat.findById(chatId).populate("messages");
+    const chat = await Message.find({chat: chatId})
 
-    io.to(chatId).emit("previousMessages", chat?.messages);
+    io.to(chatId).emit("previousMessages", chat);
   });
 
   socket.on(
@@ -53,9 +53,9 @@ io.on("connection", (socket) => {
         });
         await message.save();
 
-        await Chat.findByIdAndUpdate(chatId, {
-          $push: { messages: message._id },
-        });
+        // await Chat.findByIdAndUpdate(chatId, {
+        //   $push: { messages: message._id },
+        // });
 
         io.to(chatId).emit("receiveMessage", { message, socketId: chatId });
       } catch (error) {
@@ -82,7 +82,7 @@ io.on("connection", (socket) => {
       await notification.save()
     ).populate("sender");
 
-    io.emit("receiveNotification", { createdNotification, userId });
+    io.emit("receiveNotification", { createdNotification, userId: createdNotification.receiver });
   });
 
   //comments

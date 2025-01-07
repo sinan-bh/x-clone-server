@@ -18,13 +18,11 @@ export const Message = mongoose.model<IMessage>("Message", MessageSchema);
 
 export interface IChat extends Document {
   participants: mongoose.Types.ObjectId[];
-  messages: mongoose.Types.ObjectId[];
 }
 
 const ChatSchema: Schema = new Schema(
   {
     participants: [{ type: Schema.Types.ObjectId, ref: "User" }],
-    messages: [{ type: Schema.Types.ObjectId, ref: "Message" }],
   },
   { timestamps: true }
 );

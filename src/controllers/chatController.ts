@@ -5,14 +5,14 @@ import { CustomError } from "../utils/error/customError";
 import { CustomRequest } from "../types/interfaces";
 import { Notification } from "../models/notification";
 
-export const getChatMessages = async (req: Request, res: Response) => {
-  const { chatId } = req.params;
-  const chat = await Chat.findById(chatId).populate("messages");
+// export const getChatMessages = async (req: Request, res: Response) => {
+//   const { chatId } = req.params;
+//   const chat = await Chat.findById(chatId).populate("messages");
 
-  res
-    .status(200)
-    .json(new StandardResponse("successfully get Message", chat?.messages));
-};
+//   res
+//     .status(200)
+//     .json(new StandardResponse("successfully get Message", chat?.messages));
+// };
 
 export const createChat = async (req: Request, res: Response) => {
   const { user1, user2 }: { user1: string; user2: string } = req.body;
