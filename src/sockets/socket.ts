@@ -1,8 +1,8 @@
 import { createServer } from "http";
 import { Server } from "socket.io";
 import express from "express";
-import dotenv, { populate } from "dotenv";
-import { Chat, Message } from "../models/messageModel";
+import dotenv from "dotenv";
+import { Message } from "../models/messageModel";
 import { Tweet } from "../models/tweetModel";
 import { Notification } from "../models/notification";
 import { User } from "../models/userModel";
@@ -26,9 +26,9 @@ io.on("connection", (socket) => {
     socket.join(chatId);
     console.log(`User joined room: ${chatId}`);
 
-    const chat = await Chat.findById(chatId).populate("messages");
+    const chat = await Message.find({chat: chatId})
 
-    io.to(chatId).emit("previousMessages", chat?.messages);
+    io.to(chatId).emit("previousMessages", chat);
   });
 
   socket.on(
@@ -53,11 +53,7 @@ io.on("connection", (socket) => {
         });
         await message.save();
 
-        await Chat.findByIdAndUpdate(chatId, {
-          $push: { messages: message._id },
-        });
-
-        io.to(chatId).emit("receiveMessage", message);
+        io.to(chatId).emit("receiveMessage", { message, socketId: chatId });
       } catch (error) {
         console.error("Error sending message:", error);
       }
@@ -65,17 +61,45 @@ io.on("connection", (socket) => {
   );
 
   //likes
-  socket.on("likes", async ({ postId }) => {
+  socket.on("likes", async ({ postId, userId }) => {
     const tweet = await Tweet.findById(postId);
     const updatedLikes = tweet?.likes.length;
     io.emit("updatedLikes", { updatedLikes, postId });
+
+    const notification = new Notification({
+      sender: userId,
+      receiver: tweet?.user._id,
+      type: "like",
+      message: "liked your post",
+      reference: postId,
+      isRead: false,
+    });
+    const createdNotification = await (
+      await notification.save()
+    ).populate("sender");
+
+    io.emit("receiveNotification", { createdNotification, userId: createdNotification.receiver });
   });
 
   //comments
-  socket.on("comment", async ({ postId }) => {
+  socket.on("comment", async ({ postId, userId }) => {
     const tweet = await Tweet.findById(postId);
     const updatedComment = tweet?.comments.length && tweet?.comments.length + 1;
     io.emit("updatedComments", { updatedComment, postId });
+
+    const notification = new Notification({
+      sender: userId,
+      receiver: tweet?.user._id,
+      type: "comment",
+      message: "commented your post",
+      reference: postId,
+      isRead: false,
+    });
+    const createdNotification = await (
+      await notification.save()
+    ).populate("sender");
+
+    io.emit("receiveNotification", { createdNotification, userId });
   });
 
   //following and followers
@@ -94,7 +118,7 @@ io.on("connection", (socket) => {
       const user = await User.findOne({ userName });
       const isFollow = user?.followers.some(
         (f) => f._id.toString() === likedUserId
-      );      
+      );
 
       io.emit("previousFollowComment", { isFollow });
     }
@@ -112,35 +136,14 @@ io.on("connection", (socket) => {
   });
 
   //notification
-  // socket.on("joinNotification", async ({ userId }) => {
-  //   socket.join(userId);
+  socket.on("joinNotification", async ({ userId }) => {
+    socket.join(userId);
 
-  //   const notification = await User.findById(userId).populate("notification");
-
-  //   io.emit("previouseNotification", { notification, userId });
-  // });
-  // socket.on(
-  //   "notification",
-  //   async ({ senderId, userId, type, message, reference }) => {
-  //     const notification = new Notification({
-  //       user: senderId,
-  //       type,
-  //       message,
-  //       reference,
-  //       isRead: false,
-  //     });
-  //     const createdNotification = await notification.save();
-
-  //     const receiveNotification = await User.findByIdAndUpdate(
-  //       userId,
-  //       {
-  //         $push: { notification: createdNotification._id },
-  //       },
-  //       { new: true }
-  //     );
-  //     io.emit("receiveNotification", receiveNotification?.notification);
-  //   }
-  // );
+    const notification = await Notification.find({ receiver: userId })
+      .populate("sender")
+      .sort({ createdAt: -1 });
+    io.emit("previouseNotification", { notification, userId });
+  });
 
   socket.on("disconnect", () => {
     console.log("User disconnected:", socket.id);
