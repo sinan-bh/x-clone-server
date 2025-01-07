@@ -1,8 +1,8 @@
 import { createServer } from "http";
 import { Server } from "socket.io";
 import express from "express";
-import dotenv, { populate } from "dotenv";
-import { Chat, Message } from "../models/messageModel";
+import dotenv from "dotenv";
+import { Message } from "../models/messageModel";
 import { Tweet } from "../models/tweetModel";
 import { Notification } from "../models/notification";
 import { User } from "../models/userModel";
@@ -52,10 +52,6 @@ io.on("connection", (socket) => {
           timestamp: new Date(),
         });
         await message.save();
-
-        // await Chat.findByIdAndUpdate(chatId, {
-        //   $push: { messages: message._id },
-        // });
 
         io.to(chatId).emit("receiveMessage", { message, socketId: chatId });
       } catch (error) {
