@@ -201,7 +201,7 @@ export const login = async (req: Request, res: Response): Promise<void> => {
       email: user.email,
     },
     process.env.JWT_SECRET_KEY || "",
-    { expiresIn: "1h" }
+    { expiresIn: "7d" }
   );
 
   res.status(200).json(
