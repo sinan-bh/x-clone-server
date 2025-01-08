@@ -26,7 +26,7 @@ io.on("connection", (socket) => {
     socket.join(chatId);
     console.log(`User joined room: ${chatId}`);
 
-    const chat = await Message.find({chat: chatId})
+    const chat = await Message.find({ chat: chatId });
 
     io.to(chatId).emit("previousMessages", chat);
   });
@@ -49,10 +49,9 @@ io.on("connection", (socket) => {
           chat: chatId,
           timestamp: new Date(),
         });
-        
-        const newMessage = await message.save();
+        await message.save();
 
-        io.to(chatId).emit("receiveMessage", { newMessage, socketId: chatId });
+        io.to(chatId).emit("receiveMessage", { message, socketId: chatId });
       } catch (error) {
         console.error("Error sending message:", error);
       }
@@ -77,7 +76,10 @@ io.on("connection", (socket) => {
       await notification.save()
     ).populate("sender");
 
-    io.emit("receiveNotification", { createdNotification, userId: createdNotification.receiver });
+    io.emit("receiveNotification", {
+      createdNotification,
+      userId: createdNotification.receiver,
+    });
   });
 
   //comments
