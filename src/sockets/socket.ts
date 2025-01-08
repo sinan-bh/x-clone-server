@@ -43,17 +43,15 @@ io.on("connection", (socket) => {
       content: string;
     }) => {
       try {
-        console.log(chatId, sender, content);
-
         const message = new Message({
           sender,
           content,
           chat: chatId,
           timestamp: new Date(),
         });
-        await message.save();
+        const newMessage = await message.save();
 
-        io.to(chatId).emit("receiveMessage", { message, socketId: chatId });
+        io.to(chatId).emit("receiveMessage", { newMessage, socketId: chatId });
       } catch (error) {
         console.error("Error sending message:", error);
       }
