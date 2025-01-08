@@ -49,6 +49,7 @@ io.on("connection", (socket) => {
           chat: chatId,
           timestamp: new Date(),
         });
+        
         const newMessage = await message.save();
 
         io.to(chatId).emit("receiveMessage", { newMessage, socketId: chatId });
