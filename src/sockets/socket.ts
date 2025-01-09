@@ -26,7 +26,7 @@ io.on("connection", (socket) => {
     socket.join(chatId);
     console.log(`User joined room: ${chatId}`);
 
-    const chat = await Message.find({chat: chatId})
+    const chat = await Message.find({ chat: chatId });
 
     io.to(chatId).emit("previousMessages", chat);
   });
@@ -43,8 +43,6 @@ io.on("connection", (socket) => {
       content: string;
     }) => {
       try {
-        console.log(chatId, sender, content);
-
         const message = new Message({
           sender,
           content,
@@ -78,7 +76,10 @@ io.on("connection", (socket) => {
       await notification.save()
     ).populate("sender");
 
-    io.emit("receiveNotification", { createdNotification, userId: createdNotification.receiver });
+    io.emit("receiveNotification", {
+      createdNotification,
+      userId: createdNotification.receiver,
+    });
   });
 
   //comments
