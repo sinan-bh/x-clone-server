@@ -227,28 +227,28 @@ export const googleAuth = async (req: Request, res: Response) => {
     throw new CustomError("user not registered", 404);
   }
 
-  const { accessToken, refreshToken } = generateTokens(existingUser);
+  // const { accessToken, refreshToken } = generateTokens(existingUser);
 
-  res.cookie("refreshToken", refreshToken, {
-    httpOnly: true,
-    secure: process.env.NODE_ENV === "development",
-    sameSite: "strict",
-    maxAge: 7 * 24 * 60 * 60 * 1000,
-  });
+  // res.cookie("refreshToken", refreshToken, {
+  //   httpOnly: true,
+  //   secure: process.env.NODE_ENV === "development",
+  //   sameSite: "strict",
+  //   maxAge: 7 * 24 * 60 * 60 * 1000,
+  // });
 
-  // const token = jwt.sign(
-  //   {
-  //     id: existingUser._id,
-  //     username: existingUser.userName,
-  //     email: existingUser.email,
-  //   },
-  //   process.env.JWT_SECRET_KEY || "",
-  //   { expiresIn: "1h" }
-  // );
+  const token = jwt.sign(
+    {
+      id: existingUser._id,
+      username: existingUser.userName,
+      email: existingUser.email,
+    },
+    process.env.JWT_SECRET_KEY || "",
+    { expiresIn: "1h" }
+  );
 
   res.status(200).json(
     new StandardResponse("Login successful", {
-      token: accessToken,
+      token: token,
       user: {
         id: existingUser._id,
         name: existingUser.name,
