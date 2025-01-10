@@ -224,38 +224,38 @@ export const googleAuth = async (req: Request, res: Response) => {
   const existingUser = await User.findOne({ email });
 
   if (!existingUser) {
-    throw new CustomError("user not registered", 404);
-  }
+    res.status(200).json(new StandardResponse("User not found", email));
+  } else {
+    // const { accessToken, refreshToken } = generateTokens(existingUser);
 
-  // const { accessToken, refreshToken } = generateTokens(existingUser);
+    // res.cookie("refreshToken", refreshToken, {
+    //   httpOnly: true,
+    //   secure: process.env.NODE_ENV === "development",
+    //   sameSite: "strict",
+    //   maxAge: 7 * 24 * 60 * 60 * 1000,
+    // });
 
-  // res.cookie("refreshToken", refreshToken, {
-  //   httpOnly: true,
-  //   secure: process.env.NODE_ENV === "development",
-  //   sameSite: "strict",
-  //   maxAge: 7 * 24 * 60 * 60 * 1000,
-  // });
-
-  const token = jwt.sign(
-    {
-      id: existingUser._id,
-      username: existingUser.userName,
-      email: existingUser.email,
-    },
-    process.env.JWT_SECRET_KEY || "",
-    { expiresIn: "7d" }
-  );
-
-  res.status(200).json(
-    new StandardResponse("Login successful", {
-      token: token,
-      user: {
+    const token = jwt.sign(
+      {
         id: existingUser._id,
-        name: existingUser.name,
-        userName: existingUser.userName,
-        profilePicture: existingUser.profilePicture,
+        username: existingUser.userName,
         email: existingUser.email,
       },
-    })
-  );
+      process.env.JWT_SECRET_KEY || "",
+      { expiresIn: "7d" }
+    );
+
+    res.status(200).json(
+      new StandardResponse("Login successful", {
+        token: token,
+        user: {
+          id: existingUser._id,
+          name: existingUser.name,
+          userName: existingUser.userName,
+          profilePicture: existingUser.profilePicture,
+          email: existingUser.email,
+        },
+      })
+    );
+  }
 };
