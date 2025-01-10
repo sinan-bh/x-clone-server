@@ -1,13 +1,22 @@
 import mongoose, { Schema, Document } from "mongoose";
 import bcrypt from "bcrypt";
+import { boolean } from "zod";
 
 export interface IUser extends Document {
   name: string;
-  username: string;
+  userName: string;
   email: string;
   password: string;
   bio?: string;
   profilePicture?: string;
+  bgImage?: string;
+  web?: string;
+  location?: string;
+  followStatus: boolean;
+  post: mongoose.Types.ObjectId[];
+  likes: mongoose.Types.ObjectId[];
+  saved: mongoose.Types.ObjectId[];
+  comments: mongoose.Types.ObjectId[];
   followers: mongoose.Types.ObjectId[];
   following: mongoose.Types.ObjectId[];
 }
@@ -15,11 +24,24 @@ export interface IUser extends Document {
 const UserSchema: Schema = new Schema(
   {
     name: { type: String, required: true },
-    username: { type: String, required: true, unique: true },
+    userName: { type: String, required: true, unique: true },
     email: { type: String, required: true, unique: true },
     password: { type: String, required: true },
     bio: { type: String },
-    profilePicture: { type: String },
+    profilePicture: {
+      type: String,
+      default:
+        "https://png.pngitem.com/pimgs/s/24-248235_user-profile-avatar-login-account-fa-user-circle.png",
+    },
+    bgImage: { type: String },
+    web: { type: String },
+    location: { type: String },
+    followStatus: { type: String, default: false },
+    post: [{ type: Schema.Types.ObjectId, ref: "Tweet" }],
+    rePost: [{ type: Schema.Types.ObjectId, ref: "Tweet" }],
+    likes: [{ type: Schema.Types.ObjectId, ref: "Tweet" }],
+    saved: [{ type: Schema.Types.ObjectId, ref: "Tweet" }],
+    comments: [{ type: Schema.Types.ObjectId, ref: "Comment" }],
     followers: [{ type: Schema.Types.ObjectId, ref: "User" }],
     following: [{ type: Schema.Types.ObjectId, ref: "User" }],
   },
