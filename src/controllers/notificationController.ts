@@ -4,7 +4,6 @@ import { CustomError } from "../utils/error/customError";
 import { StandardResponse } from "../utils/standardResponse";
 
 export const readedNotification = async (req: Request, res: Response) => {
-  console.log("aaaaaaa");
 
   const { notificationId } = req.params;
 
@@ -16,7 +15,6 @@ export const readedNotification = async (req: Request, res: Response) => {
 
   notification.isRead = true;
 
-  console.log(notification);
 
   await notification.save();
 

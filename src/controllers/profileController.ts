@@ -145,9 +145,7 @@ export const followingFollowers = async (req: Request, res: Response) => {
 };
 
 export const searchUsers = async (req: Request, res: Response) => {
-  const { query } = req.query;
-  console.log(query);
-  
+  const { query } = req.query;  
   const users = await User.find({
     userName: { $regex: query, $options: "i" },
   });

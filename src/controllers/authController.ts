@@ -130,8 +130,6 @@ export const finalRegistration = async (
 
 // Refresh Token Route
 export const refreshToken = async (req: Request, res: Response) => {
-  console.log("hhhhhhhhhhh");
-
   const refreshToken = req.cookies.refreshToken; // Use HTTP-only cookie
   if (!refreshToken) {
     throw new CustomError("Refresh token not found", 401);
@@ -243,7 +241,7 @@ export const googleAuth = async (req: Request, res: Response) => {
       email: existingUser.email,
     },
     process.env.JWT_SECRET_KEY || "",
-    { expiresIn: "1h" }
+    { expiresIn: "7d" }
   );
 
   res.status(200).json(
