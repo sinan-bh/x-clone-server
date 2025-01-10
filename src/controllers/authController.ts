@@ -243,7 +243,7 @@ export const googleAuth = async (req: Request, res: Response) => {
       email: existingUser.email,
     },
     process.env.JWT_SECRET_KEY || "",
-    { expiresIn: "1h" }
+    { expiresIn: "7d" }
   );
 
   res.status(200).json(
